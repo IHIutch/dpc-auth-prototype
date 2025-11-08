@@ -1,5 +1,5 @@
 import { useForm } from '@tanstack/react-form'
-import { z } from 'zod'
+import * as z from 'zod'
 
 const jwtFormSchema = z.object({
   publicKeyId: z.string().min(1, 'Public Key ID is required'),

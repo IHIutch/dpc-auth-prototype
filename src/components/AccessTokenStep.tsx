@@ -1,5 +1,5 @@
 import { useForm } from '@tanstack/react-form'
-import { z } from 'zod'
+import * as z from 'zod'
 
 const accessTokenFormSchema = z.object({
   jwt: z.string().min(1, 'JWT token is required'),

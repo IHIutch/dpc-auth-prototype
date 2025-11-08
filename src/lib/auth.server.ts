@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
-import { z } from 'zod'
+import * as z from 'zod'
 
 const generateJWTSchema = z.object({
   clientToken: z.string(),

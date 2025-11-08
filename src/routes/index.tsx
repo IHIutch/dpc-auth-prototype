@@ -1,3 +1,5 @@
+import * as React from 'react'
+
 import { createFileRoute } from '@tanstack/react-router'
 import { ClientTokenStep } from '@/components/ClientTokenStep'
 import { KeyGenerationStep } from '@/components/KeyGenerationStep'
@@ -15,6 +17,18 @@ function Home() {
   const keyGeneration = useKeyGeneration()
   const jwtGeneration = useJWTGeneration()
   const accessToken = useAccessToken()
+
+  // Show warning if user tries to close window with generated private key
+  React.useEffect(() => {
+    if (!keyGeneration.privateKey) return
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault()
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [keyGeneration.privateKey])
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">

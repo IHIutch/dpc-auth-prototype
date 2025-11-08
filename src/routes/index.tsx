@@ -76,10 +76,8 @@ function Home() {
   }
 
   // Generate JWT token using server function
-  const handleGenerateJWT = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!CLIENT_TOKEN || !privateKey || !publicKeyId) {
+  const handleGenerateJWT = async (data: { publicKeyId: string }) => {
+    if (!CLIENT_TOKEN || !privateKey || !data.publicKeyId) {
       setError('Client token, private key, and public key ID are required')
       return
     }
@@ -91,7 +89,7 @@ function Home() {
       const result = await generateJWT({
         data: {
           clientToken: CLIENT_TOKEN,
-          publicKeyId,
+          publicKeyId: data.publicKeyId,
           privateKeyPem: privateKey,
         }
       })
@@ -110,9 +108,7 @@ function Home() {
   }
 
   // Fetch access token using server function
-  const handleFetchAccessToken = async (e: React.FormEvent) => {
-    e.preventDefault()
-
+  const handleFetchAccessToken = async () => {
     if (!jwt) {
       setError('JWT token is required')
       return

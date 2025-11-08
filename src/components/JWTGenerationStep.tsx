@@ -31,11 +31,26 @@ export function JWTGenerationStep() {
 
   return (
     <div className="bg-white shadow-lg rounded-lg border border-gray-200 mb-6">
-      <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+      <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
         <h3 className="text-lg font-semibold text-gray-900">Step 3: Generate JWT</h3>
+        <form.Subscribe
+          selector={(formState) => [formState.canSubmit, formState.isSubmitting]}
+        >
+          {([canSubmit, isSubmitting]) => (
+            <button
+              type="submit"
+              form="jwt-form"
+              disabled={!canSubmit || !privateKey}
+              className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
+            >
+              {isSubmitting ? 'Generating...' : 'Generate JWT (RS384)'}
+            </button>
+          )}
+        </form.Subscribe>
       </div>
       <div className="p-6">
         <form
+          id="jwt-form"
           onSubmit={(e) => {
             e.preventDefault()
             e.stopPropagation()
@@ -68,19 +83,6 @@ export function JWTGenerationStep() {
             )}
           </form.Field>
 
-          <form.Subscribe
-            selector={(formState) => [formState.canSubmit, formState.isSubmitting]}
-          >
-            {([canSubmit, isSubmitting]) => (
-              <button
-                type="submit"
-                disabled={!canSubmit || !privateKey}
-                className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors mb-4"
-              >
-                {isSubmitting ? 'Generating...' : 'Generate JWT (RS384)'}
-              </button>
-            )}
-          </form.Subscribe>
         </form>
 
         <div className="mb-4">

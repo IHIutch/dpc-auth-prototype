@@ -2,7 +2,6 @@ import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
-import Header from '../components/Header'
 import { DPCProvider } from '../contexts/DPCContext'
 
 import appCss from '../styles.css?url'
@@ -40,7 +39,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <DPCProvider>
-          <Header />
           {children}
           <TanStackDevtools
             config={{

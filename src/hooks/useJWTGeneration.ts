@@ -62,6 +62,7 @@ export function useJWTGeneration() {
   return {
     jwt: jwtData?.jwt || '',
     publicKeyId: jwtData?.publicKeyId || '',
+    clientToken: CLIENT_TOKEN,
     generateJWT: generateJWTMutation.mutate,
     setPublicKeyId,
     isLoading: generateJWTMutation.isPending,

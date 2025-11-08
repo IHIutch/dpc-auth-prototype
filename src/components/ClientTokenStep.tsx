@@ -1,4 +1,4 @@
-import { CLIENT_TOKEN } from "@/lib/constants";
+import { CLIENT_TOKEN } from '@/lib/constants'
 
 export function ClientTokenStep() {
   return (
@@ -9,11 +9,11 @@ export function ClientTokenStep() {
       <div className="p-6">
         <div className="mb-4">
           <label htmlFor="clientToken" className="block text-sm font-medium text-gray-700 mb-2">
-            Client Token
+            Client Token (Base64 Encoded)
           </label>
           <textarea
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-not-allowed bg-gray-400/20 text-gray-600"
             id="clientToken"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-not-allowed bg-gray-400/20 text-gray-600"
             value={CLIENT_TOKEN}
             rows={8}
             readOnly

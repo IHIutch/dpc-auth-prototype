@@ -1,33 +1,19 @@
 import { useForm } from '@tanstack/react-form'
 import * as z from 'zod'
+import { useJWTGeneration } from '@/hooks/useJWTGeneration'
 
 const jwtFormSchema = z.object({
   publicKeyId: z.string().min(1, 'Public Key ID is required'),
 })
 
-interface JWTGenerationStepProps {
-  publicKeyId: string
-  jwt: string
-  loading: boolean
-  onGenerateJWT: (data: { publicKeyId: string }) => void
-  setPublicKeyId: (id: string) => void
-  error: string
-}
-
-export function JWTGenerationStep({
-  publicKeyId,
-  jwt,
-  loading,
-  onGenerateJWT,
-  setPublicKeyId,
-  error
-}: JWTGenerationStepProps) {
+export function JWTGenerationStep() {
+  const { publicKeyId, jwt, generateJWT, setPublicKeyId, isLoading, error } = useJWTGeneration()
   const form = useForm({
     defaultValues: {
       publicKeyId: publicKeyId,
     },
     onSubmit: async ({ value }) => {
-      onGenerateJWT(value)
+      generateJWT(value)
     },
   })
 
@@ -38,10 +24,10 @@ export function JWTGenerationStep({
         <button
           type="button"
           className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
-          disabled={loading || !form.state.isValid}
+          disabled={isLoading || !form.state.isValid}
           onClick={() => form.handleSubmit()}
         >
-          {loading ? 'Generating...' : 'Generate JWT (RS384)'}
+          {isLoading ? 'Generating...' : 'Generate JWT (RS384)'}
         </button>
       </div>
       <div className="p-6">

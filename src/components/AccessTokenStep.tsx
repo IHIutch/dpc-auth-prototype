@@ -1,31 +1,17 @@
 import { useForm } from '@tanstack/react-form'
-import * as z from 'zod'
+import { useAccessToken } from '@/hooks/useAccessToken'
+import { useJWTGeneration } from '@/hooks/useJWTGeneration'
 
-const accessTokenFormSchema = z.object({
-  jwt: z.string().min(1, 'JWT token is required'),
-})
+export function AccessTokenStep() {
+  const { accessToken, fetchAccessToken, isLoading, error } = useAccessToken()
+  const { jwt } = useJWTGeneration()
 
-interface AccessTokenStepProps {
-  jwt: string
-  accessToken: string
-  loading: boolean
-  onFetchAccessToken: () => void
-  error: string
-}
-
-export function AccessTokenStep({
-  jwt,
-  accessToken,
-  loading,
-  onFetchAccessToken,
-  error
-}: AccessTokenStepProps) {
   const form = useForm({
     defaultValues: {
       jwt: jwt,
     },
     onSubmit: async () => {
-      onFetchAccessToken()
+      fetchAccessToken()
     },
   })
 
@@ -36,10 +22,10 @@ export function AccessTokenStep({
         <button
           type="button"
           className="bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
-          disabled={loading || !jwt || !form.state.isValid}
+          disabled={isLoading || !jwt || !form.state.isValid}
           onClick={() => form.handleSubmit()}
         >
-          {loading ? 'Fetching...' : 'Fetch Access Token'}
+          {isLoading ? 'Fetching...' : 'Fetch Access Token'}
         </button>
       </div>
       <div className="p-6">
@@ -58,18 +44,16 @@ export function AccessTokenStep({
         >
           <form.Field
             name="jwt"
-            validators={{
-              onBlur: ({ value }) => {
-                const result = accessTokenFormSchema.shape.jwt.safeParse(value)
-                return result.success ? undefined : result.error.issues[0]?.message
-              },
-            }}
             children={(field) => (
-              <div className="hidden">
-                <input
-                  type="hidden"
-                  name={field.name}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  JWT Token (Required for Access Token)
+                </label>
+                <textarea
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm cursor-not-allowed bg-gray-400/20 text-gray-600"
+                  rows={4}
                   value={field.state.value}
+                  readOnly
                 />
               </div>
             )}
@@ -78,12 +62,14 @@ export function AccessTokenStep({
 
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">Access Token Response</label>
-          <textarea
+          <output
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm cursor-not-allowed bg-gray-400/20 text-gray-600"
-            rows={6}
-            value={accessToken}
-            readOnly
-          />
+          // rows={6}
+          // value={accessToken}
+          // readOnly
+          >
+            {accessToken}
+          </output>
         </div>
       </div>
     </div>

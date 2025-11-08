@@ -4,14 +4,14 @@ import { ClientTokenStep } from '@/components/ClientTokenStep'
 import { KeyGenerationStep } from '@/components/KeyGenerationStep'
 import { JWTGenerationStep } from '@/components/JWTGenerationStep'
 import { AccessTokenStep } from '@/components/AccessTokenStep'
-import { useKeyGeneration } from '@/hooks/useKeyGeneration'
+import { useDPC } from '@/contexts/DPCContext'
 
 export const Route = createFileRoute('/')({
   component: Home,
 })
 
 function Home() {
-  const { privateKey } = useKeyGeneration()
+  const { privateKey } = useDPC()
 
   // Show warning if user tries to close window with generated private key
   React.useEffect(() => {

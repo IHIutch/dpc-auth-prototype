@@ -1,23 +1,59 @@
-import { useForm } from '@tanstack/react-form'
-import * as z from 'zod'
+import { useState } from 'react'
 import { SNIPPET } from "@/lib/constants"
-import { useKeyGeneration } from '@/hooks/useKeyGeneration'
-
-const keyGenerationFormSchema = z.object({
-  snippet: z.string().min(1, 'Snippet is required for key verification'),
-})
+import { useDPC } from '@/contexts/DPCContext'
+import { generatePublicKeySignature } from '@/lib/auth.server'
 
 export function KeyGenerationStep() {
-  const { publicKey, privateKey, publicKeySignature, generateKeyPair, isLoading, error } = useKeyGeneration()
+  const { publicKey, privateKey, publicKeySignature, setData } = useDPC()
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const form = useForm({
-    defaultValues: {
-      snippet: SNIPPET,
-    },
-    onSubmit: async () => {
-      generateKeyPair()
-    },
-  })
+  const handleGenerateKeyPair = async () => {
+    setIsLoading(true)
+    setError('')
+    try {
+      const keyPair = await window.crypto.subtle.generateKey(
+        {
+          name: 'RSASSA-PKCS1-v1_5',
+          modulusLength: 4096,
+          publicExponent: new Uint8Array([1, 0, 1]),
+          hash: 'SHA-384',
+        },
+        true,
+        ['sign', 'verify']
+      )
+
+      // Export public key
+      const publicKeyBuffer = await window.crypto.subtle.exportKey('spki', keyPair.publicKey)
+      const publicKeyBase64 = btoa(String.fromCharCode(...new Uint8Array(publicKeyBuffer)))
+      const publicKeyPem = `-----BEGIN PUBLIC KEY-----\n${publicKeyBase64.match(/.{1,64}/g)?.join('\n')}\n-----END PUBLIC KEY-----`
+
+      // Export private key
+      const privateKeyBuffer = await window.crypto.subtle.exportKey('pkcs8', keyPair.privateKey)
+      const privateKeyBase64 = btoa(String.fromCharCode(...new Uint8Array(privateKeyBuffer)))
+      const privateKeyPem = `-----BEGIN PRIVATE KEY-----\n${privateKeyBase64.match(/.{1,64}/g)?.join('\n')}\n-----END PRIVATE KEY-----`
+
+      // Generate public key signature
+      const result = await generatePublicKeySignature({
+        data: { privateKeyPem }
+      })
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to generate public key signature')
+      }
+
+      setData(prev => ({
+        ...prev,
+        publicKey: publicKeyPem,
+        privateKey: privateKeyPem,
+        publicKeySignature: result.signature || '',
+      }))
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unknown error')
+    } finally {
+      setIsLoading(false)
+    }
+  }
   return (
     <div className="bg-white shadow-lg rounded-lg border border-gray-200 mb-6">
       <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
@@ -25,8 +61,8 @@ export function KeyGenerationStep() {
         <button
           type="button"
           className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
-          onClick={() => form.handleSubmit()}
-          disabled={isLoading || !form.state.isValid}
+          onClick={handleGenerateKeyPair}
+          disabled={isLoading}
         >
           {isLoading ? 'Generating...' : 'Generate RSA 4096 Key Pair'}
         </button>
@@ -38,37 +74,14 @@ export function KeyGenerationStep() {
           </div>
         )}
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            form.handleSubmit()
-          }}
-        >
-          <form.Field
-            name="snippet"
-            validators={{
-              onBlur: ({ value }) => {
-                const result = keyGenerationFormSchema.shape.snippet.safeParse(value)
-                return result.success ? undefined : result.error.issues[0]?.message
-              },
-            }}
-            children={(field) => (
-              <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <label htmlFor={field.name} className="block text-sm font-medium text-blue-900 mb-2">
-                  DPC Snippet Content (Required for Key Verification):
-                </label>
-                <input
-                  id={field.name}
-                  name={field.name}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm cursor-not-allowed bg-gray-400/20 text-gray-600"
-                  value={field.state.value}
-                  readOnly
-                />
-              </div>
-            )}
+        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h4 className="text-sm font-medium text-blue-900 mb-2">DPC Snippet Content:</h4>
+          <input 
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm cursor-not-allowed bg-gray-400/20 text-gray-600" 
+            value={SNIPPET} 
+            readOnly 
           />
-        </form>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>

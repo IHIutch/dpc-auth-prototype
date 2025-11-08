@@ -1,22 +1,11 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import Header from '../components/Header'
+import { DPCProvider } from '../contexts/DPCContext'
 
 import appCss from '../styles.css?url'
-
-// Create a client
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      refetchOnWindowFocus: false,
-    },
-  },
-})
 
 export const Route = createRootRoute({
   head: () => ({
@@ -50,10 +39,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <QueryClientProvider client={queryClient}>
+        <DPCProvider>
           <Header />
           {children}
-          <ReactQueryDevtools initialIsOpen={false} />
           <TanStackDevtools
             config={{
               position: 'bottom-right',
@@ -65,7 +53,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               },
             ]}
           />
-        </QueryClientProvider>
+        </DPCProvider>
         <Scripts />
       </body>
     </html>

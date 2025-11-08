@@ -31,8 +31,16 @@ export function AccessTokenStep({
 
   return (
     <div className="bg-white shadow-lg rounded-lg border border-gray-200 mb-6">
-      <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+      <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
         <h3 className="text-lg font-semibold text-gray-900">Step 4: Fetch Access Token</h3>
+        <button
+          type="button"
+          className="bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors"
+          disabled={loading || !jwt || !form.state.isValid}
+          onClick={() => form.handleSubmit()}
+        >
+          {loading ? 'Fetching...' : 'Fetch Access Token'}
+        </button>
       </div>
       <div className="p-6">
         {error && (
@@ -66,13 +74,6 @@ export function AccessTokenStep({
               </div>
             )}
           />
-          <button
-            type="submit"
-            className="bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors mb-4"
-            disabled={loading || !jwt || !form.state.isValid}
-          >
-            {loading ? 'Fetching...' : 'Fetch Access Token'}
-          </button>
         </form>
 
         <div className="mb-4">

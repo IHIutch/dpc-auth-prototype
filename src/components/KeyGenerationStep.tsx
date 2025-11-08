@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { SNIPPET } from "@/lib/constants"
 import { useDPC } from '@/contexts/DPCContext'
-import { generatePublicKeySignature } from '@/lib/auth.server'
+import { generatePublicKeySignature } from '@/lib/auth.client'
 
 export function KeyGenerationStep() {
   const { publicKey, privateKey, publicKeySignature, setData } = useDPC()
@@ -34,19 +34,13 @@ export function KeyGenerationStep() {
       const privateKeyPem = `-----BEGIN PRIVATE KEY-----\n${privateKeyBase64.match(/.{1,64}/g)?.join('\n')}\n-----END PRIVATE KEY-----`
 
       // Generate public key signature
-      const result = await generatePublicKeySignature({
-        data: { privateKeyPem }
-      })
-
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to generate public key signature')
-      }
+      const signature = await generatePublicKeySignature({ privateKeyPem })
 
       setData(prev => ({
         ...prev,
         publicKey: publicKeyPem,
         privateKey: privateKeyPem,
-        publicKeySignature: result.signature || '',
+        publicKeySignature: signature,
       }))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error')
@@ -76,10 +70,10 @@ export function KeyGenerationStep() {
 
         <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <h4 className="text-sm font-medium text-blue-900 mb-2">DPC Snippet Content:</h4>
-          <input 
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm cursor-not-allowed bg-gray-400/20 text-gray-600" 
-            value={SNIPPET} 
-            readOnly 
+          <input
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm cursor-not-allowed bg-gray-400/20 text-gray-600"
+            value={SNIPPET}
+            readOnly
           />
         </div>
 

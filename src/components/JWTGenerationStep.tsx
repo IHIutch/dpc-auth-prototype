@@ -1,11 +1,11 @@
 import { useForm } from '@tanstack/react-form'
 import { useDPC } from '@/contexts/DPCContext'
-import { generateJWT } from '@/lib/auth.server'
+import { generateJWT } from '@/lib/auth.client'
 import { CLIENT_TOKEN } from '@/lib/constants'
 
 export function JWTGenerationStep() {
   const { publicKeyId, jwt, privateKey, setData } = useDPC()
-  
+
   const form = useForm({
     defaultValues: {
       publicKeyId: publicKeyId,
@@ -15,21 +15,15 @@ export function JWTGenerationStep() {
         throw new Error('Private key is required')
       }
 
-      const result = await generateJWT({
-        data: {
-          clientToken: CLIENT_TOKEN,
-          publicKeyId: value.publicKeyId,
-          privateKeyPem: privateKey,
-        }
+      const jwt = await generateJWT({
+        clientToken: CLIENT_TOKEN,
+        publicKeyId: value.publicKeyId,
+        privateKeyPem: privateKey
       })
-
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to generate JWT')
-      }
 
       setData(prev => ({
         ...prev,
-        jwt: result.jwt || '',
+        jwt,
         publicKeyId: value.publicKeyId,
       }))
     },
@@ -78,8 +72,8 @@ export function JWTGenerationStep() {
             selector={(formState) => [formState.canSubmit, formState.isSubmitting]}
           >
             {([canSubmit, isSubmitting]) => (
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={!canSubmit || !privateKey}
                 className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors mb-4"
               >

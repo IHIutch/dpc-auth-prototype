@@ -1,11 +1,12 @@
+import { SNIPPET } from "@/lib/constants"
 
 interface KeyGenerationStepProps {
   publicKey: string
   privateKey: string
   publicKeySignature: string
   loading: boolean
-  snippet: string
   onGenerateKeyPair: () => void
+  error: string
 }
 
 export function KeyGenerationStep({
@@ -13,8 +14,8 @@ export function KeyGenerationStep({
   privateKey,
   publicKeySignature,
   loading,
-  snippet,
-  onGenerateKeyPair
+  onGenerateKeyPair,
+  error
 }: KeyGenerationStepProps) {
   return (
     <div className="bg-white shadow-lg rounded-lg border border-gray-200 mb-6">
@@ -22,9 +23,15 @@ export function KeyGenerationStep({
         <h3 className="text-lg font-semibold text-gray-900">Step 2: Generate Key Pair</h3>
       </div>
       <div className="p-6">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+            {error}
+          </div>
+        )}
+
         <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <h4 className="text-sm font-medium text-blue-900 mb-2">DPC Snippet Content:</h4>
-          <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm cursor-not-allowed bg-gray-400/20 text-gray-600" value={snippet} readOnly />
+          <input className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm cursor-not-allowed bg-gray-400/20 text-gray-600" value={SNIPPET} readOnly />
         </div>
 
         <button

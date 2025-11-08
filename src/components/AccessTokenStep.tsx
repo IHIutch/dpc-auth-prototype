@@ -10,13 +10,15 @@ interface AccessTokenStepProps {
   accessToken: string
   loading: boolean
   onFetchAccessToken: () => void
+  error: string
 }
 
 export function AccessTokenStep({
   jwt,
   accessToken,
   loading,
-  onFetchAccessToken
+  onFetchAccessToken,
+  error
 }: AccessTokenStepProps) {
   const form = useForm({
     defaultValues: {
@@ -33,6 +35,12 @@ export function AccessTokenStep({
         <h3 className="text-lg font-semibold text-gray-900">Step 4: Fetch Access Token</h3>
       </div>
       <div className="p-6">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+            {error}
+          </div>
+        )}
+
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -43,7 +51,7 @@ export function AccessTokenStep({
           <form.Field
             name="jwt"
             validators={{
-              onBlur: (value) => {
+              onBlur: ({ value }) => {
                 const result = accessTokenFormSchema.shape.jwt.safeParse(value)
                 return result.success ? undefined : result.error.issues[0]?.message
               },

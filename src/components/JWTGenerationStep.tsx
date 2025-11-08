@@ -9,18 +9,18 @@ interface JWTGenerationStepProps {
   publicKeyId: string
   jwt: string
   loading: boolean
-  clientToken: string
   onGenerateJWT: (data: { publicKeyId: string }) => void
   setPublicKeyId: (id: string) => void
+  error: string
 }
 
 export function JWTGenerationStep({
   publicKeyId,
   jwt,
   loading,
-  clientToken,
   onGenerateJWT,
-  setPublicKeyId
+  setPublicKeyId,
+  error
 }: JWTGenerationStepProps) {
   const form = useForm({
     defaultValues: {
@@ -37,6 +37,12 @@ export function JWTGenerationStep({
         <h3 className="text-lg font-semibold text-gray-900">Step 3: Generate JWT</h3>
       </div>
       <div className="p-6">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+            {error}
+          </div>
+        )}
+
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -48,7 +54,7 @@ export function JWTGenerationStep({
             <form.Field
               name="publicKeyId"
               validators={{
-                onBlur: (value) => {
+                onBlur: ({ value }) => {
                   const result = jwtFormSchema.shape.publicKeyId.safeParse(value)
                   return result.success ? undefined : result.error.issues[0]?.message
                 },
@@ -81,7 +87,7 @@ export function JWTGenerationStep({
           <button
             type="submit"
             className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition-colors mb-4"
-            disabled={loading || !clientToken || !form.state.isValid}
+            disabled={loading || !form.state.isValid}
           >
             {loading ? 'Generating...' : 'Generate JWT (RS384)'}
           </button>

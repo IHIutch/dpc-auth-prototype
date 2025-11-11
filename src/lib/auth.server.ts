@@ -15,7 +15,13 @@ export const fetchAccessToken = createServerFn({ method: 'POST' })
         method: 'POST',
         headers: {
           'Accept': 'application/json',
-          'Content-Type': 'application/x-www-form-urlencoded'
+          'Content-Type': 'application/x-www-form-urlencoded',
+          "User-Agent": 'DPC-Auth-Prototype/1.0 (Cloudflare-Workers)'
+          // - Identifies your specific application
+          // - Follows RFC 7231 standards (ProductName/Version (Comments))
+          // - Indicates the runtime environment
+          // - Helps with debugging and monitoring
+          // - Looks professional in server logs
         },
         body: new URLSearchParams({
           scope: 'system/*.*',

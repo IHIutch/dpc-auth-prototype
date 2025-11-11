@@ -1,13 +1,13 @@
 import { useForm } from '@tanstack/react-form'
 import { useDPC } from '@/contexts/DPCContext'
 import { generateJWT } from '@/lib/auth.client'
-import { CLIENT_TOKEN } from '@/lib/constants'
 
 export function JWTGenerationStep() {
-  const { publicKeyId, jwt, privateKey, setData } = useDPC()
+  const { publicKeyId, jwt, privateKey, clientToken, setData } = useDPC()
 
   const form = useForm({
     defaultValues: {
+      clientToken: clientToken,
       publicKeyId: publicKeyId,
     },
     onSubmit: async ({ value }) => {
@@ -16,7 +16,7 @@ export function JWTGenerationStep() {
       }
 
       const jwt = await generateJWT({
-        clientToken: CLIENT_TOKEN,
+        clientToken: value.clientToken,
         publicKeyId: value.publicKeyId,
         privateKeyPem: privateKey
       })
@@ -24,7 +24,6 @@ export function JWTGenerationStep() {
       setData(prev => ({
         ...prev,
         jwt,
-        publicKeyId: value.publicKeyId,
       }))
     },
   })
@@ -32,7 +31,7 @@ export function JWTGenerationStep() {
   return (
     <div className="bg-white shadow-lg rounded-lg border border-gray-200 mb-6">
       <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-900">Step 3: Generate JWT</h3>
+        <h3 className="text-lg font-semibold text-gray-900">Step 2: Generate JWT</h3>
         <form.Subscribe
           selector={(formState) => [formState.canSubmit, formState.isSubmitting]}
         >
@@ -82,6 +81,31 @@ export function JWTGenerationStep() {
               </div>
             )}
           </form.Field>
+
+          <form.Field
+            name="clientToken"
+            validators={{
+              onChange: ({ value }) =>
+                !value || value.trim().length === 0 ? 'Client Token is required' : undefined,
+            }}
+          >
+            {(field) => (
+              <div className="mb-4">
+                <label htmlFor={field.name} className="block text-sm font-medium text-gray-700 mb-2">
+                  Client Token (Base64 Encoded)
+                </label>
+                <textarea
+                  id={field.name}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  name={field.name}
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  rows={8}
+                />
+              </div>
+            )}
+          </form.Field>
+
 
         </form>
 

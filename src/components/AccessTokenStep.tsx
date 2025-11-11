@@ -28,7 +28,7 @@ export function AccessTokenStep() {
   return (
     <div className="bg-white shadow-lg rounded-lg border border-gray-200 mb-6">
       <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-        <h3 className="text-lg font-semibold text-gray-900">Step 4: Fetch Access Token</h3>
+        <h3 className="text-lg font-semibold text-gray-900">Step 3: Fetch Access Token</h3>
         <form.Subscribe
           selector={(formState) => [formState.canSubmit, formState.isSubmitting]}
         >

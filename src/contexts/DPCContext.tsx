@@ -6,6 +6,7 @@ interface DPCData {
   publicKeySignature: string
   jwt: string
   publicKeyId: string
+  clientToken: string
   accessToken: string
 }
 
@@ -23,6 +24,7 @@ const initialData: DPCData = {
   publicKeySignature: '',
   jwt: '',
   publicKeyId: '',
+  clientToken: '',
   accessToken: '',
 }
 
